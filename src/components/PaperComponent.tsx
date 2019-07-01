@@ -1,7 +1,10 @@
 import React from 'react';
-import PaperComponent from './PaperComponent';
+// import PaperComponent from './PaperComponent';
 import Paper from '@material-ui/core/Paper';
 import { thisExpression } from '@babel/types';
+import dump from './../dump.json';
+import { array } from 'prop-types';
+import { BASE_URL } from './../Utilities/constants';
 // import { CHANCES, TEST_STRING } from './../utilities/constants';
 // import { getSodukuTime, randomise, sodukuState } from './../utilities/helper';
 // interface IChildComponentProps extends React.Props<any> {
@@ -11,12 +14,24 @@ type IChildComponentProps = {};
 // interface PP {
 //   zDepth: number;
 // }
-class CardComponent extends React.Component<IChildComponentProps, {}> {
+class PaperComponent extends React.Component<
+  IChildComponentProps,
+  {
+    movieObjectClicked: {};
+    clickedNumber: any;
+  }
+> {
   constructor(props: any) {
     super(props);
-    this.state = {};
+    this.state = {
+      movieObjectClicked: {},
+      clickedNumber: null
+    };
   }
-  public handlePaperClick = (e: any): void => {};
+  public handlePaperClick = (data: any, clickedNumber: string): void => {
+    // console.log('this papper clicked', data);
+    this.setState({ movieObjectClicked: data, clickedNumber: clickedNumber });
+  };
   // public startTimer = (st: number) => {
   //   const t: string = getSodukuTime(st);
   //   this.setState({ time: t });
@@ -88,67 +103,61 @@ class CardComponent extends React.Component<IChildComponentProps, {}> {
   //     </div>
   //   );
   // };
-  public _renderChildren = () => {
+  public _renderChildren = (props: any): any => {
+    console.log('retrieving', props.data.EventImageCode);
     return (
       <div>
         <div
           className="image-wrap"
           style={{
-            backgroundImage:
-              'url(https://in.bmscdn.com/events/moviecard/ET00046165.jpg)'
+            backgroundImage: `url(${BASE_URL}${props.data.EventImageCode}.jpg)`
           }}
         />
-        <div className="movie-name">Thugs of hindustan</div>
+        <div className="movie-name">{props.data.EventTitle}</div>
+      </div>
+    );
+  };
+  public _renderMovieTrailer = (): any => {
+    let data: any = this.state.movieObjectClicked;
+    var res = data.TrailerURL.replace('watch?v=', 'embed/');
+    return (
+      <div className="movie-trailer">
+        <iframe width="420" height="345" src={res} />
       </div>
     );
   };
   public renderPaperComponent: any = () => {
-    return (
-      <div className="row flex-row">
+    console.log('efefefe', typeof dump[1]);
+    let arr = [];
+    let da: any = dump[1];
+    for (let i in da) {
+      arr.push(
         <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
+          {this.state.clickedNumber == i ? <this._renderMovieTrailer /> : null}
           <Paper
-            onClick={e => this.handlePaperClick(e)}
-            children={<this._renderChildren />}
+            onClick={() => this.handlePaperClick(da[i], i)}
+            children={<this._renderChildren data={da[i]} />}
             className="InsightsCustomPaper"
           />
         </div>
-        <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
-          <Paper
-            onClick={e => this.handlePaperClick(e)}
-            children={<this._renderChildren />}
-            className="InsightsCustomPaper"
-          />
-        </div>
-        <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
-          <Paper
-            onClick={e => this.handlePaperClick(e)}
-            children={<this._renderChildren />}
-            className="InsightsCustomPaper"
-          />
-        </div>
-        <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
-          <Paper
-            onClick={e => this.handlePaperClick(e)}
-            children={<this._renderChildren />}
-            className="InsightsCustomPaper"
-          />
-        </div>
-        <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
-          <Paper
-            onClick={e => this.handlePaperClick(e)}
-            children={<this._renderChildren />}
-            className="InsightsCustomPaper"
-          />
-        </div>
-        <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
-          <Paper
-            onClick={e => this.handlePaperClick(e)}
-            children={<this._renderChildren />}
-            className="InsightsCustomPaper"
-          />
-        </div>
-      </div>
-    );
+      );
+    }
+    return arr;
+    // return (
+    //   <div className="row flex-row">
+    //     {dump[1].map(key => {
+    //       return (
+    //         <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
+    //           <Paper
+    //             onClick={e => this.handlePaperClick(e)}
+    //             children={<this._renderChildren />}
+    //             className="InsightsCustomPaper"
+    //           />
+    //         </div>
+    //       );
+    //     })}
+    //   </div>
+    // );
   };
   // public renderTableComponent = (): any => {
   //   const component: any[] = [];
@@ -168,7 +177,12 @@ class CardComponent extends React.Component<IChildComponentProps, {}> {
   //   );
   // };
   public render() {
-    return <PaperComponent />;
+    console.log('fefef', dump);
+    return (
+      <div className="row flex-row">
+        <this.renderPaperComponent />
+      </div>
+    );
   }
 }
-export default CardComponent;
+export default PaperComponent;
