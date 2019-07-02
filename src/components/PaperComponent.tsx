@@ -10,7 +10,9 @@ import { BASE_URL } from './../Utilities/constants';
 // interface IChildComponentProps extends React.Props<any> {
 //   zDepth: number;
 // }
-type IChildComponentProps = {};
+type IChildComponentProps = {
+  // myRef: any;
+};
 // interface PP {
 //   zDepth: number;
 // }
@@ -19,18 +21,39 @@ class PaperComponent extends React.Component<
   {
     movieObjectClicked: {};
     clickedNumber: any;
+    right: number;
   }
 > {
+  // console.log('myRef',myRef);
   constructor(props: any) {
     super(props);
+    // this.myRef = ;
     this.state = {
       movieObjectClicked: {},
-      clickedNumber: null
+      clickedNumber: null,
+      right: 0
     };
   }
-  public handlePaperClick = (data: any, clickedNumber: string): void => {
-    // console.log('this papper clicked', data);
-    this.setState({ movieObjectClicked: data, clickedNumber: clickedNumber });
+  public handlePaperClick = (
+    e: any,
+    data: any,
+    clickedNumber: string
+  ): void => {
+    let rect: any = e.currentTarget.getBoundingClientRect();
+    console.log(
+      'this papper clickedddd',
+      rect.top,
+      rect.right,
+      rect.bottom,
+      rect.left
+    );
+    console.log('this papper clicked', e.currentTarget);
+
+    this.setState({
+      movieObjectClicked: data,
+      clickedNumber: clickedNumber,
+      right: rect.left
+    });
   };
   // public startTimer = (st: number) => {
   //   const t: string = getSodukuTime(st);
@@ -104,13 +127,14 @@ class PaperComponent extends React.Component<
   //   );
   // };
   public _renderChildren = (props: any): any => {
-    console.log('retrieving', props.data.EventImageCode);
+    console.log('retrieving', props);
+    // ${BASE_URL}${props.data.EventImageCode}.jpg
     return (
       <div>
         <div
           className="image-wrap"
           style={{
-            backgroundImage: `url(${BASE_URL}${props.data.EventImageCode}.jpg)`
+            backgroundImage: `url(${BASE_URL}${props.data.EventImageCode}.jpg`
           }}
         />
         <div className="movie-name">{props.data.EventTitle}</div>
@@ -120,26 +144,43 @@ class PaperComponent extends React.Component<
   public _renderMovieTrailer = (): any => {
     let data: any = this.state.movieObjectClicked;
     var res = data.TrailerURL.replace('watch?v=', 'embed/');
+    // let v='
     return (
-      <div className="movie-trailer">
-        <iframe width="420" height="345" src={res} />
+      <div className="container-fluid">
+        <div className="movie-trailer" style={{ left: this.state.right * -1 }}>
+          <div className="row">
+            <div className="col-ld-6">
+              <iframe width="620" height="345" src={res} />
+            </div>
+            <div className="col-ld-6">guarav</div>
+          </div>
+        </div>
       </div>
     );
   };
   public renderPaperComponent: any = () => {
-    console.log('efefefe', typeof dump[1]);
+    // const node = myRef;
+    // console.log('efefefe', node);
+    // {this.state.clickedNumber == i ? <this._renderMovieTrailer /> : null}
+    // let myRef: any = React.createRef<HTMLDivElement>();
+    // console.log(myRef.current);
     let arr = [];
     let da: any = dump[1];
+    let count = 0;
     for (let i in da) {
       arr.push(
-        <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
-          {this.state.clickedNumber == i ? <this._renderMovieTrailer /> : null}
-          <Paper
-            onClick={() => this.handlePaperClick(da[i], i)}
-            children={<this._renderChildren data={da[i]} />}
-            className="InsightsCustomPaper"
-          />
-        </div>
+        <>
+          <div className="col-lg-2 col-md-6 col-sm-6 col-xs-12">
+            <Paper
+              onClick={e => this.handlePaperClick(e, da[i], i)}
+              children={<this._renderChildren data={da[i]} item={count++} />}
+              className="InsightsCustomPaper"
+            />
+            {this.state.clickedNumber == i ? (
+              <this._renderMovieTrailer />
+            ) : null}
+          </div>
+        </>
       );
     }
     return arr;

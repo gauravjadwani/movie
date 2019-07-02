@@ -34,3 +34,8 @@
 #root{
   background-color: chartreuse;
 }
+.movie-trailer{
+  width: 100vw !important;
+  position: relative;
+  z-index: 1;
+}
