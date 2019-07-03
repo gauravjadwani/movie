@@ -32,7 +32,8 @@
   }
 }
 #root{
-  background-color: chartreuse;
+  /* 696969 */
+  background-color:black;
 }
 .movie-trailer{
   width: 100vw !important;
